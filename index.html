@@ -2,49 +2,67 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Flashcard N5</title>
+  <title>Flashcard N5 PRO</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <h1>Flashcard Tiếng Nhật 🇯🇵</h1>
+<h1>Flashcard N5 🚀</h1>
 
-  <!-- MODE -->
-  <p id="mode">Nhật → Việt</p>
-  <button onclick="toggleMode()">🔄 Đổi hướng</button>
+<!-- MODE -->
+<p id="mode">Nhật → Việt</p>
+<button onclick="toggleMode()">🔄 Đổi hướng</button>
 
-  <!-- CARD -->
-  <div class="card-container" onclick="flipCard()">
-    <div class="card" id="card">
-      <div class="front" id="front"></div>
-      <div class="back" id="back"></div>
-    </div>
+<!-- CHẾ ĐỘ -->
+<div>
+  <button onclick="setMode('flashcard')">📇 Flashcard</button>
+  <button onclick="setMode('quiz')">🎯 Trắc nghiệm</button>
+  <button onclick="setMode('typing')">⌨️ Nhập đáp án</button>
+</div>
+
+<!-- CARD -->
+<div class="card-container" onclick="flipCard()" id="cardBox">
+  <div class="card" id="card">
+    <div class="front" id="front"></div>
+    <div class="back" id="back"></div>
   </div>
+</div>
 
-  <!-- STATS -->
-  <p id="progress"></p>
-  <p id="wrongCount"></p>
+<!-- QUIZ -->
+<div id="quizBox" style="display:none">
+  <p id="question"></p>
+  <div id="answers"></div>
+</div>
 
-  <!-- CONTROL -->
-  <div>
-    <button onclick="prevCard()">⬅️</button>
-    <button onclick="nextCard()">➡️</button>
-    <button onclick="randomCard()">🎲</button>
-  </div>
+<!-- TYPING -->
+<div id="typingBox" style="display:none">
+  <p id="typingQuestion"></p>
+  <input id="typingInput" placeholder="Nhập đáp án..." />
+  <button onclick="checkTyping()">OK</button>
+</div>
 
-  <div>
-    <button onclick="markKnown()">✅ Biết</button>
-    <button onclick="markWrong()">❌ Chưa biết</button>
-  </div>
+<!-- CONTROL -->
+<div>
+  <button onclick="prevCard()">⬅️</button>
+  <button onclick="nextCard()">➡️</button>
+  <button onclick="randomCard()">🎲</button>
+  <button onclick="speak()">🔊</button>
+</div>
 
-  <div>
-    <button onclick="studyWrong()">📚 Học từ sai</button>
-    <button onclick="backToAll()">🔙 Học tất cả</button>
-    <button onclick="resetWrong()">🗑 Reset</button>
-  </div>
+<div>
+  <button onclick="markKnown()">✅</button>
+  <button onclick="markWrong()">❌</button>
+</div>
 
-  <script src="script.js"></script>
+<div>
+  <button onclick="studyWrong()">📚</button>
+  <button onclick="backToAll()">🔙</button>
+</div>
 
+<p id="progress"></p>
+<p id="wrongCount"></p>
+
+<script src="script.js"></script>
 </body>
 </html>
