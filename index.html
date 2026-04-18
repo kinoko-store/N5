@@ -10,6 +10,7 @@
 
   <h1>Flashcard Tiếng Nhật 🇯🇵</h1>
 
+  <!-- CARD -->
   <div class="card-container" onclick="flipCard()">
     <div class="card" id="card">
       <div class="front" id="front"></div>
@@ -17,10 +18,18 @@
     </div>
   </div>
 
+  <!-- BUTTON -->
   <div>
     <button onclick="prevCard()">⬅️</button>
     <button onclick="nextCard()">➡️</button>
     <button onclick="randomCard()">🎲 Random</button>
+  </div>
+
+  <div>
+    <button onclick="markKnown()">✅ Biết</button>
+    <button onclick="markWrong()">❌ Chưa biết</button>
+    <button onclick="studyWrong()">📚 Học từ sai</button>
+    <button onclick="resetWrong()">🗑 Reset</button>
   </div>
 
   <script src="script.js"></script>
