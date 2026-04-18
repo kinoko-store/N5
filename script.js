@@ -7,10 +7,17 @@ fetch('data.csv')
   .then(res => res.text())
   .then(text => {
     const lines = text.split('\n');
-    flashcards = lines.map(line => {
-      const [jp, vi] = line.split(';');
-      return { jp, vi };
-    });
+
+    flashcards = lines
+      .filter(line => line.trim() !== "")
+      .map(line => {
+        const [jp, vi] = line.split(';');
+        return {
+          jp: jp?.trim(),
+          vi: vi?.trim()
+        };
+      });
+
     showCard();
   });
 
