@@ -6,16 +6,25 @@ let wrongCards = JSON.parse(localStorage.getItem("wrongCards") || "[]");
 
 let mode = "jp-vi";
 
-// LOAD LESSON
+// LOAD LESSON (FIX CHẮC CHẮN CHẠY)
 function loadLesson(file) {
   fetch(file)
-    .then(res => res.text())
+    .then(res => {
+      if (!res.ok) {
+        alert("❌ Không tìm thấy file: " + file);
+        return "";
+      }
+      return res.text();
+    })
     .then(text => {
+      if (!text) return;
+
       originalCards = text
+        .replace(/\r/g, '')
         .split('\n')
-        .filter(l => l.includes(';'))
-        .map(l => {
-          let [jp, ...rest] = l.split(';');
+        .filter(line => line.trim() && line.includes(';'))
+        .map(line => {
+          let [jp, ...rest] = line.split(';');
           return {
             jp: jp.trim(),
             vi: rest.join(';').trim()
@@ -24,14 +33,16 @@ function loadLesson(file) {
 
       flashcards = [...originalCards];
       current = 0;
+
       showCard();
+      updateStats();
     });
 }
 
-// DEFAULT LOAD
-loadLesson('lesson2.txt');
+// LOAD MẶC ĐỊNH
+loadLesson('input.txt');
 
-// SHOW
+// HIỂN THỊ
 function showCard() {
   if (flashcards.length === 0) return;
 
@@ -43,18 +54,14 @@ function showCard() {
     ? flashcards[current].vi
     : flashcards[current].jp;
 
-  frontEl.innerText = front;
-  backEl.innerText = back;
+  document.getElementById("front").innerText = front;
+  document.getElementById("back").innerText = back;
 
-  card.classList.remove("flipped");
+  document.getElementById("card").classList.remove("flipped");
 
-  progress.innerText = `${current+1}/${flashcards.length}`;
+  document.getElementById("progress").innerText =
+    `${current + 1} / ${flashcards.length}`;
 }
-
-// DOM
-const frontEl = document.getElementById("front");
-const backEl = document.getElementById("back");
-const card = document.getElementById("card");
 
 // CONTROL
 function nextCard() {
@@ -73,7 +80,7 @@ function randomCard() {
 }
 
 function flipCard() {
-  card.classList.toggle("flipped");
+  document.getElementById("card").classList.toggle("flipped");
 }
 
 // MODE
@@ -86,18 +93,24 @@ function toggleMode() {
 
 // MARK
 function markWrong() {
-  let c = flashcards[current];
-  if (!wrongCards.some(x => x.jp === c.jp)) {
-    wrongCards.push(c);
+  let card = flashcards[current];
+
+  if (!wrongCards.some(c => c.jp === card.jp)) {
+    wrongCards.push(card);
     localStorage.setItem("wrongCards", JSON.stringify(wrongCards));
   }
+
+  updateStats();
   nextCard();
 }
 
 function markKnown() {
-  let c = flashcards[current];
-  wrongCards = wrongCards.filter(x => x.jp !== c.jp);
+  let card = flashcards[current];
+
+  wrongCards = wrongCards.filter(c => c.jp !== card.jp);
   localStorage.setItem("wrongCards", JSON.stringify(wrongCards));
+
+  updateStats();
   nextCard();
 }
 
@@ -110,6 +123,11 @@ function speak() {
 
 // STUDY
 function studyWrong() {
+  if (wrongCards.length === 0) {
+    alert("Không có từ sai 😎");
+    return;
+  }
+
   flashcards = [...wrongCards];
   current = 0;
   showCard();
@@ -119,4 +137,10 @@ function backToAll() {
   flashcards = [...originalCards];
   current = 0;
   showCard();
+}
+
+// STATS
+function updateStats() {
+  document.getElementById("wrongCount").innerText =
+    `Từ sai: ${wrongCards.length}`;
 }
