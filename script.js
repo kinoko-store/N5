@@ -37,3 +37,9 @@ function nextCard() {
   current = (current + 1) % flashcards.length;
   showCard();
 }
+function randomCard() {
+  if (flashcards.length === 0) return;
+
+  current = Math.floor(Math.random() * flashcards.length);
+  showCard();
+}
