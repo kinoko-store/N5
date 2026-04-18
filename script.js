@@ -1,21 +1,18 @@
 let flashcards = [];
 let current = 0;
 
-// lưu từ sai
-let wrongCards = JSON.parse(localStorage.getItem("wrongCards")) || [];
+// load từ sai
+let wrongCards = JSON.parse(localStorage.getItem("wrongCards") || "[]");
 
-// 🚀 Load từ input.txt
+// 🚀 Load data
 fetch('input.txt')
-  .then(res => {
-    if (!res.ok) throw new Error("Không load được file");
-    return res.text();
-  })
+  .then(res => res.text())
   .then(text => {
     flashcards = text
       .replace(/\r/g, '')
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line !== "" && line.includes(';'))
+      .filter(line => line && line.includes(';'))
       .map(line => {
         const [jp, ...rest] = line.split(';');
         return {
@@ -25,6 +22,7 @@ fetch('input.txt')
       });
 
     showCard();
+    updateStats();
   });
 
 // 📌 Hiển thị
@@ -35,72 +33,86 @@ function showCard() {
   document.getElementById("back").innerText = flashcards[current].vi;
 
   document.getElementById("card").classList.remove("flipped");
+
+  // progress
+  document.getElementById("progress").innerText =
+    `Từ ${current + 1} / ${flashcards.length}`;
 }
 
-// 🔄 Lật
+// 🔄 flip
 function flipCard() {
   document.getElementById("card").classList.toggle("flipped");
 }
 
-// ➡️ Next
+// ➡️ next (ưu tiên từ sai)
 function nextCard() {
-  current = (current + 1) % flashcards.length;
+  if (Math.random() < 0.3 && wrongCards.length > 0) {
+    // 30% gặp lại từ sai
+    const randomWrong = wrongCards[Math.floor(Math.random() * wrongCards.length)];
+    current = flashcards.findIndex(c => c.jp === randomWrong.jp);
+  } else {
+    current = (current + 1) % flashcards.length;
+  }
+
   showCard();
 }
 
-// ⬅️ Prev
+// ⬅️ prev
 function prevCard() {
   current = (current - 1 + flashcards.length) % flashcards.length;
   showCard();
 }
 
-// 🎲 Random
+// 🎲 random
 function randomCard() {
-  if (flashcards.length <= 1) return;
-
-  let newIndex;
-  do {
-    newIndex = Math.floor(Math.random() * flashcards.length);
-  } while (newIndex === current);
-
-  current = newIndex;
+  current = Math.floor(Math.random() * flashcards.length);
   showCard();
 }
 
-// ✅ Biết
+// ✅ biết
 function markKnown() {
   nextCard();
 }
 
-// ❌ Chưa biết
+// ❌ chưa biết
 function markWrong() {
   const card = flashcards[current];
 
-  if (!wrongCards.find(c => c.jp === card.jp)) {
+  if (!wrongCards.some(c => c.jp === card.jp)) {
     wrongCards.push(card);
     localStorage.setItem("wrongCards", JSON.stringify(wrongCards));
   }
 
+  updateStats();
   nextCard();
 }
 
-// 📚 Học từ sai
+// 📚 học lại
 function studyWrong() {
-  if (wrongCards.length === 0) {
-    alert("Chưa có từ sai 😎");
+  const saved = JSON.parse(localStorage.getItem("wrongCards") || "[]");
+
+  if (saved.length === 0) {
+    alert("Không có từ sai 😎");
     return;
   }
 
-  flashcards = [...wrongCards];
+  flashcards = saved;
   current = 0;
   showCard();
 }
 
-// 🗑 Reset
+// 🗑 reset
 function resetWrong() {
   localStorage.removeItem("wrongCards");
   wrongCards = [];
+  updateStats();
   alert("Đã reset!");
+}
+
+// 📊 thống kê
+function updateStats() {
+  document.getElementById("wrongCount").innerText =
+    `Từ sai: ${wrongCards.length}`;
 }
 
 // ⌨️ phím tắt
