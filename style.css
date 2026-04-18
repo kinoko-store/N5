@@ -37,10 +37,7 @@ body {
   padding: 10px;
 }
 
-.front {
-  background: white;
-}
-
+.front { background: white; }
 .back {
   background: #4CAF50;
   color: white;
@@ -48,13 +45,8 @@ body {
 }
 
 button {
-  padding: 10px 15px;
+  padding: 10px;
   margin: 6px;
   border-radius: 8px;
   border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.85;
 }
