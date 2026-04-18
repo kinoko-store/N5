@@ -1,10 +1,14 @@
 let flashcards = [];
 let current = 0;
 
-// load từ sai
+// lưu từ sai
 let wrongCards = JSON.parse(localStorage.getItem("wrongCards") || "[]");
 
-// 🚀 Load data
+// mode
+let mode = localStorage.getItem("mode") || "jp-vi";
+let isMix = false;
+
+// load data
 fetch('input.txt')
   .then(res => res.text())
   .then(text => {
@@ -21,60 +25,73 @@ fetch('input.txt')
         };
       });
 
+    updateModeText();
     showCard();
     updateStats();
   });
 
-// 📌 Hiển thị
+// hiển thị
 function showCard() {
   if (flashcards.length === 0) return;
 
-  document.getElementById("front").innerText = flashcards[current].jp;
-  document.getElementById("back").innerText = flashcards[current].vi;
+  let front, back;
+
+  // 🧠 mode trộn
+  let currentMode = mode;
+  if (isMix) {
+    currentMode = Math.random() > 0.5 ? "jp-vi" : "vi-jp";
+  }
+
+  if (currentMode === "jp-vi") {
+    front = flashcards[current].jp;
+    back = flashcards[current].vi;
+  } else {
+    front = flashcards[current].vi;
+    back = flashcards[current].jp;
+  }
+
+  document.getElementById("front").innerText = front;
+  document.getElementById("back").innerText = back;
 
   document.getElementById("card").classList.remove("flipped");
 
-  // progress
   document.getElementById("progress").innerText =
     `Từ ${current + 1} / ${flashcards.length}`;
 }
 
-// 🔄 flip
+// flip
 function flipCard() {
   document.getElementById("card").classList.toggle("flipped");
 }
 
-// ➡️ next (ưu tiên từ sai)
+// next (ưu tiên từ sai)
 function nextCard() {
   if (Math.random() < 0.3 && wrongCards.length > 0) {
-    // 30% gặp lại từ sai
-    const randomWrong = wrongCards[Math.floor(Math.random() * wrongCards.length)];
-    current = flashcards.findIndex(c => c.jp === randomWrong.jp);
+    const w = wrongCards[Math.floor(Math.random() * wrongCards.length)];
+    current = flashcards.findIndex(c => c.jp === w.jp);
   } else {
     current = (current + 1) % flashcards.length;
   }
-
   showCard();
 }
 
-// ⬅️ prev
+// prev
 function prevCard() {
   current = (current - 1 + flashcards.length) % flashcards.length;
   showCard();
 }
 
-// 🎲 random
+// random
 function randomCard() {
   current = Math.floor(Math.random() * flashcards.length);
   showCard();
 }
 
-// ✅ biết
+// đánh dấu
 function markKnown() {
   nextCard();
 }
 
-// ❌ chưa biết
 function markWrong() {
   const card = flashcards[current];
 
@@ -87,7 +104,7 @@ function markWrong() {
   nextCard();
 }
 
-// 📚 học lại
+// học lại
 function studyWrong() {
   const saved = JSON.parse(localStorage.getItem("wrongCards") || "[]");
 
@@ -101,7 +118,7 @@ function studyWrong() {
   showCard();
 }
 
-// 🗑 reset
+// reset
 function resetWrong() {
   localStorage.removeItem("wrongCards");
   wrongCards = [];
@@ -109,13 +126,31 @@ function resetWrong() {
   alert("Đã reset!");
 }
 
-// 📊 thống kê
+// mode
+function toggleMode() {
+  mode = mode === "jp-vi" ? "vi-jp" : "jp-vi";
+  localStorage.setItem("mode", mode);
+  updateModeText();
+  showCard();
+}
+
+function toggleMix() {
+  isMix = !isMix;
+  alert(isMix ? "Đang trộn 2 chiều 🧠" : "Tắt trộn");
+}
+
+// UI
+function updateModeText() {
+  document.getElementById("mode").innerText =
+    mode === "jp-vi" ? "Nhật → Việt" : "Việt → Nhật";
+}
+
 function updateStats() {
   document.getElementById("wrongCount").innerText =
     `Từ sai: ${wrongCards.length}`;
 }
 
-// ⌨️ phím tắt
+// phím tắt
 document.addEventListener("keydown", function(e) {
   if (e.code === "Space") flipCard();
   if (e.code === "ArrowRight") nextCard();
