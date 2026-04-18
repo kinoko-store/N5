@@ -1,48 +1,56 @@
 let flashcards = [];
 let current = 0;
 
-// 🚀 Load data từ CSV
+// 🚀 Load CSV (xử lý dữ liệu mạnh hơn)
 fetch('data.csv')
   .then(res => res.text())
   .then(text => {
-    const lines = text.split('\n');
-
-    flashcards = lines
-      .filter(line => line.trim() !== "")
+    flashcards = text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line !== "" && line.includes(';')) // bỏ dòng lỗi
       .map(line => {
-        const [jp, vi] = line.split(';');
+        const parts = line.split(';');
+
         return {
-          jp: jp?.trim(),
-          vi: vi?.trim()
+          jp: parts[0]?.trim(),
+          vi: parts.slice(1).join(';').trim() // giữ nguyên nếu có ; trong nghĩa
         };
       });
 
+    console.log("DATA:", flashcards); // debug
     showCard();
-  });
+  })
+  .catch(err => console.error("Lỗi load data:", err));
 
-// 📌 Hiển thị card
+// 📌 Hiển thị
 function showCard() {
   if (flashcards.length === 0) return;
 
   document.getElementById("front").innerText = flashcards[current].jp;
   document.getElementById("back").innerText = flashcards[current].vi;
 
-  // reset trạng thái lật
   document.getElementById("card").classList.remove("flipped");
 }
 
-// 🔄 Lật card (animation)
+// 🔄 Lật thẻ
 function flipCard() {
   document.getElementById("card").classList.toggle("flipped");
 }
 
-// 👉 Next card
+// ➡️ Next
 function nextCard() {
   current = (current + 1) % flashcards.length;
   showCard();
 }
 
-// 🎲 Random card (không lặp lại ngay)
+// ⬅️ Prev
+function prevCard() {
+  current = (current - 1 + flashcards.length) % flashcards.length;
+  showCard();
+}
+
+// 🎲 Random (không lặp lại ngay)
 function randomCard() {
   if (flashcards.length <= 1) return;
 
@@ -55,13 +63,7 @@ function randomCard() {
   showCard();
 }
 
-// ⬅️ Previous card
-function prevCard() {
-  current = (current - 1 + flashcards.length) % flashcards.length;
-  showCard();
-}
-
-// ⌨️ Điều khiển bằng phím
+// ⌨️ phím tắt
 document.addEventListener("keydown", function(e) {
   if (e.code === "Space") flipCard();
   if (e.code === "ArrowRight") nextCard();
