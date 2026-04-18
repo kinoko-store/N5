@@ -1,23 +1,32 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Flashcard JP-VN</title>
+  <title>Flashcard N5</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <h1>Flashcard Tiếng Nhật 🇯🇵</h1>
 
+  <!-- CARD -->
   <div class="card-container" onclick="flipCard()">
-  <div class="card" id="card">
-    <div class="front" id="front"></div>
-    <div class="back" id="back"></div>
+    <div class="card" id="card">
+      <div class="front" id="front"></div>
+      <div class="back" id="back"></div>
+    </div>
   </div>
-</div>
 
-  <button onclick="nextCard()">🎲 Random</button>
+  <!-- BUTTON -->
+  <div>
+    <button onclick="prevCard()">⬅️</button>
+    <button onclick="nextCard()">➡️</button>
+    <button onclick="randomCard()">🎲 Random</button>
+  </div>
 
+  <!-- SCRIPT -->
   <script src="script.js"></script>
+
 </body>
 </html>
