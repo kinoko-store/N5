@@ -8,7 +8,7 @@ body {
   perspective: 1000px;
   width: 320px;
   height: 200px;
-  margin: 50px auto;
+  margin: 40px auto;
 }
 
 .card {
@@ -17,7 +17,6 @@ body {
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.6s;
-  cursor: pointer;
 }
 
 .card.flipped {
@@ -50,11 +49,10 @@ body {
 
 button {
   padding: 10px 15px;
-  margin: 8px;
+  margin: 6px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-size: 14px;
 }
 
 button:hover {
