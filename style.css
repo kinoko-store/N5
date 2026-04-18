@@ -38,6 +38,7 @@ body {
 }
 
 .front { background: white; }
+
 .back {
   background: #4CAF50;
   color: white;
@@ -49,4 +50,9 @@ button {
   margin: 6px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
 }
