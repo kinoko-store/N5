@@ -1,27 +1,30 @@
 let flashcards = [];
 let current = 0;
 
-// 🚀 Load CSV (xử lý dữ liệu mạnh hơn)
-fetch('data.csv')
-  .then(res => res.text())
+// 🚀 Load trực tiếp file TXT
+fetch('input.txt')
+  .then(res => {
+    if (!res.ok) throw new Error("Không load được file input.txt");
+    return res.text();
+  })
   .then(text => {
     flashcards = text
+      .replace(/\r/g, '') // fix lỗi xuống dòng Windows
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line !== "" && line.includes(';')) // bỏ dòng lỗi
+      .filter(line => line !== "" && line.includes(';'))
       .map(line => {
-        const parts = line.split(';');
-
+        const [jp, ...rest] = line.split(';');
         return {
-          jp: parts[0]?.trim(),
-          vi: parts.slice(1).join(';').trim() // giữ nguyên nếu có ; trong nghĩa
+          jp: jp.trim(),
+          vi: rest.join(';').trim()
         };
       });
 
-    console.log("DATA:", flashcards); // debug
+    console.log("DATA:", flashcards);
     showCard();
   })
-  .catch(err => console.error("Lỗi load data:", err));
+  .catch(err => console.error(err));
 
 // 📌 Hiển thị
 function showCard() {
@@ -50,7 +53,7 @@ function prevCard() {
   showCard();
 }
 
-// 🎲 Random (không lặp lại ngay)
+// 🎲 Random
 function randomCard() {
   if (flashcards.length <= 1) return;
 
@@ -63,7 +66,7 @@ function randomCard() {
   showCard();
 }
 
-// ⌨️ phím tắt
+// ⌨️ Phím tắt
 document.addEventListener("keydown", function(e) {
   if (e.code === "Space") flipCard();
   if (e.code === "ArrowRight") nextCard();
