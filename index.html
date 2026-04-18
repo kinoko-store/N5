@@ -10,6 +10,10 @@
 
   <h1>Flashcard Tiếng Nhật 🇯🇵</h1>
 
+  <!-- MODE -->
+  <p id="mode">Nhật → Việt</p>
+  <button onclick="toggleMode()">🔄 Đổi hướng</button>
+
   <!-- CARD -->
   <div class="card-container" onclick="flipCard()">
     <div class="card" id="card">
@@ -18,11 +22,11 @@
     </div>
   </div>
 
-  <!-- PROGRESS -->
+  <!-- STATS -->
   <p id="progress"></p>
   <p id="wrongCount"></p>
 
-  <!-- BUTTON -->
+  <!-- CONTROL -->
   <div>
     <button onclick="prevCard()">⬅️</button>
     <button onclick="nextCard()">➡️</button>
