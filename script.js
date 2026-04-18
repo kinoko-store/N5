@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", function () {
+
 let originalCards = [];
 let flashcards = [];
 let current = 0;
@@ -52,35 +54,38 @@ function showCard() {
 }
 
 // FLIP
-function flipCard() {
+window.flipCard = function () {
   document.getElementById("card").classList.toggle("flipped");
-}
+};
 
 // NEXT
-function nextCard() {
+window.nextCard = function () {
+  if (flashcards.length === 0) return;
   current = (current + 1) % flashcards.length;
   showCard();
-}
+};
 
 // PREV
-function prevCard() {
+window.prevCard = function () {
+  if (flashcards.length === 0) return;
   current = (current - 1 + flashcards.length) % flashcards.length;
   showCard();
-}
+};
 
 // RANDOM
-function randomCard() {
+window.randomCard = function () {
+  if (flashcards.length === 0) return;
   current = Math.floor(Math.random() * flashcards.length);
   showCard();
-}
+};
 
 // MODE
-function toggleMode() {
+window.toggleMode = function () {
   mode = mode === "jp-vi" ? "vi-jp" : "jp-vi";
   localStorage.setItem("mode", mode);
   updateModeText();
   showCard();
-}
+};
 
 function updateModeText() {
   document.getElementById("mode").innerText =
@@ -88,11 +93,13 @@ function updateModeText() {
 }
 
 // MARK
-function markKnown() {
+window.markKnown = function () {
   nextCard();
-}
+};
 
-function markWrong() {
+window.markWrong = function () {
+  if (flashcards.length === 0) return;
+
   const card = flashcards[current];
 
   if (!wrongCards.some(c => c.jp === card.jp)) {
@@ -102,10 +109,10 @@ function markWrong() {
 
   updateStats();
   nextCard();
-}
+};
 
-// HỌC TỪ SAI
-function studyWrong() {
+// STUDY WRONG
+window.studyWrong = function () {
   const saved = JSON.parse(localStorage.getItem("wrongCards") || "[]");
 
   if (saved.length === 0) {
@@ -115,27 +122,28 @@ function studyWrong() {
 
   flashcards = [...saved];
   current = 0;
-
   showCard();
-}
+};
 
-// QUAY LẠI FULL
-function backToAll() {
+// BACK
+window.backToAll = function () {
   flashcards = [...originalCards];
   current = 0;
   showCard();
-}
+};
 
 // RESET
-function resetWrong() {
+window.resetWrong = function () {
   localStorage.removeItem("wrongCards");
   wrongCards = [];
   updateStats();
   alert("Đã reset!");
-}
+};
 
 // STATS
 function updateStats() {
   document.getElementById("wrongCount").innerText =
     `Từ sai: ${wrongCards.length}`;
 }
+
+});
