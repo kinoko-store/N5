@@ -8,56 +8,45 @@
 
 <body>
 
-<h1>Flashcard N5 🚀</h1>
+<h1>📚 Flashcard N5</h1>
+
+<!-- TAB BUỔI -->
+<div class="tabs">
+  <button onclick="loadLesson('lesson1.txt')">Buổi 1</button>
+  <button onclick="loadLesson('lesson2.txt')">Buổi 2</button>
+  <button onclick="loadLesson('lesson3.txt')">Buổi 3</button>
+</div>
 
 <!-- MODE -->
-<p id="mode">Nhật → Việt</p>
-<button onclick="toggleMode()">🔄 Đổi hướng</button>
-
-<!-- CHẾ ĐỘ -->
-<div>
-  <button onclick="setMode('flashcard')">📇 Flashcard</button>
-  <button onclick="setMode('quiz')">🎯 Trắc nghiệm</button>
-  <button onclick="setMode('typing')">⌨️ Nhập đáp án</button>
+<div class="top-bar">
+  <span id="mode">Nhật → Việt</span>
+  <button onclick="toggleMode()">🔄</button>
 </div>
 
 <!-- CARD -->
-<div class="card-container" onclick="flipCard()" id="cardBox">
+<div class="card-container" onclick="flipCard()">
   <div class="card" id="card">
     <div class="front" id="front"></div>
     <div class="back" id="back"></div>
   </div>
 </div>
 
-<!-- QUIZ -->
-<div id="quizBox" style="display:none">
-  <p id="question"></p>
-  <div id="answers"></div>
-</div>
-
-<!-- TYPING -->
-<div id="typingBox" style="display:none">
-  <p id="typingQuestion"></p>
-  <input id="typingInput" placeholder="Nhập đáp án..." />
-  <button onclick="checkTyping()">OK</button>
-</div>
-
 <!-- CONTROL -->
-<div>
+<div class="controls">
   <button onclick="prevCard()">⬅️</button>
   <button onclick="nextCard()">➡️</button>
   <button onclick="randomCard()">🎲</button>
   <button onclick="speak()">🔊</button>
 </div>
 
-<div>
-  <button onclick="markKnown()">✅</button>
-  <button onclick="markWrong()">❌</button>
+<div class="controls">
+  <button class="good" onclick="markKnown()">Biết</button>
+  <button class="bad" onclick="markWrong()">Chưa biết</button>
 </div>
 
-<div>
-  <button onclick="studyWrong()">📚</button>
-  <button onclick="backToAll()">🔙</button>
+<div class="controls">
+  <button onclick="studyWrong()">📚 Sai</button>
+  <button onclick="backToAll()">🔙 Tất cả</button>
 </div>
 
 <p id="progress"></p>
