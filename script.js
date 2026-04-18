@@ -1,15 +1,18 @@
 let flashcards = [];
 let current = 0;
 
-// 🚀 Load trực tiếp file TXT
+// lưu từ sai
+let wrongCards = JSON.parse(localStorage.getItem("wrongCards")) || [];
+
+// 🚀 Load từ input.txt
 fetch('input.txt')
   .then(res => {
-    if (!res.ok) throw new Error("Không load được file input.txt");
+    if (!res.ok) throw new Error("Không load được file");
     return res.text();
   })
   .then(text => {
     flashcards = text
-      .replace(/\r/g, '') // fix lỗi xuống dòng Windows
+      .replace(/\r/g, '')
       .split('\n')
       .map(line => line.trim())
       .filter(line => line !== "" && line.includes(';'))
@@ -21,10 +24,8 @@ fetch('input.txt')
         };
       });
 
-    console.log("DATA:", flashcards);
     showCard();
-  })
-  .catch(err => console.error(err));
+  });
 
 // 📌 Hiển thị
 function showCard() {
@@ -36,7 +37,7 @@ function showCard() {
   document.getElementById("card").classList.remove("flipped");
 }
 
-// 🔄 Lật thẻ
+// 🔄 Lật
 function flipCard() {
   document.getElementById("card").classList.toggle("flipped");
 }
@@ -66,7 +67,43 @@ function randomCard() {
   showCard();
 }
 
-// ⌨️ Phím tắt
+// ✅ Biết
+function markKnown() {
+  nextCard();
+}
+
+// ❌ Chưa biết
+function markWrong() {
+  const card = flashcards[current];
+
+  if (!wrongCards.find(c => c.jp === card.jp)) {
+    wrongCards.push(card);
+    localStorage.setItem("wrongCards", JSON.stringify(wrongCards));
+  }
+
+  nextCard();
+}
+
+// 📚 Học từ sai
+function studyWrong() {
+  if (wrongCards.length === 0) {
+    alert("Chưa có từ sai 😎");
+    return;
+  }
+
+  flashcards = [...wrongCards];
+  current = 0;
+  showCard();
+}
+
+// 🗑 Reset
+function resetWrong() {
+  localStorage.removeItem("wrongCards");
+  wrongCards = [];
+  alert("Đã reset!");
+}
+
+// ⌨️ phím tắt
 document.addEventListener("keydown", function(e) {
   if (e.code === "Space") flipCard();
   if (e.code === "ArrowRight") nextCard();
