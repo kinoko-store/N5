@@ -29,6 +29,8 @@ function showCard() {
 }
 
 function flipCard() {
+  document.getElementById("card").classList.toggle("flipped");
+}
   flipped = !flipped;
   document.getElementById("back").classList.toggle("hidden");
 }
