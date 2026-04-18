@@ -92,11 +92,37 @@ function updateModeText() {
     mode === "jp-vi" ? "Nhật → Việt" : "Việt → Nhật";
 }
 
-// MARK
+// ✅ BIẾT (ĐÃ FIX XOÁ KHỎI WRONG)
 window.markKnown = function () {
+  if (flashcards.length === 0) return;
+
+  const card = flashcards[current];
+
+  // xoá khỏi danh sách sai
+  let saved = JSON.parse(localStorage.getItem("wrongCards") || "[]");
+  saved = saved.filter(c => c.jp !== card.jp);
+
+  localStorage.setItem("wrongCards", JSON.stringify(saved));
+  wrongCards = saved;
+
+  // nếu đang học từ sai → cập nhật list ngay
+  if (flashcards.length !== originalCards.length) {
+    flashcards = [...saved];
+
+    if (flashcards.length === 0) {
+      alert("Bạn đã học hết từ sai 🎉");
+      backToAll();
+      return;
+    }
+
+    if (current >= flashcards.length) current = 0;
+  }
+
+  updateStats();
   nextCard();
 };
 
+// ❌ CHƯA BIẾT
 window.markWrong = function () {
   if (flashcards.length === 0) return;
 
@@ -111,7 +137,7 @@ window.markWrong = function () {
   nextCard();
 };
 
-// STUDY WRONG
+// 📚 HỌC TỪ SAI
 window.studyWrong = function () {
   const saved = JSON.parse(localStorage.getItem("wrongCards") || "[]");
 
@@ -125,7 +151,7 @@ window.studyWrong = function () {
   showCard();
 };
 
-// BACK
+// 🔙 QUAY LẠI FULL
 window.backToAll = function () {
   flashcards = [...originalCards];
   current = 0;
