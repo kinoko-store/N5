@@ -2,19 +2,20 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>N5 Learning App</title>
+<title>N5 Smart App</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>📘 N5 Vocabulary</h1>
+<h1>📘 N5 Smart Learning</h1>
 
-<!-- Tabs -->
 <div id="tabs" class="tabs"></div>
 
-<!-- Form -->
-<div class="panel">
+<!-- ===== QUẢN LÝ ===== -->
+<div class="card">
+  <h3>⚙️ Quản lý dữ liệu</h3>
+
   <select id="lessonSelect"></select>
 
   <input id="jp" placeholder="Tiếng Nhật">
@@ -22,20 +23,33 @@
 
   <button onclick="addWord()">➕ Thêm</button>
 
+  <br>
+
   <input type="file" id="fileInput" accept=".txt">
   <button onclick="importTxt()">📥 Import</button>
-
-  <button onclick="startFlash()">🎴 Học</button>
 </div>
 
-<!-- List -->
+<!-- ===== HỌC ===== -->
+<div class="card">
+  <h3>🎴 Học</h3>
+
+  <button onclick="startFlash()">Học tất cả</button>
+  <button onclick="startWrong()">Học từ sai</button>
+</div>
+
+<!-- LIST -->
 <div id="list"></div>
 
-<!-- Flashcard -->
+<!-- FLASHCARD -->
 <div id="flash" class="flash hidden">
   <div id="card"></div>
-  <button onclick="flip()">Lật</button>
-  <button onclick="next()">Tiếp</button>
+
+  <div class="flash-btn">
+    <button onclick="flip()">Lật</button>
+    <button onclick="markWrong()">❌ Sai</button>
+    <button onclick="markRight()">✅ Đúng</button>
+  </div>
+
   <button onclick="closeFlash()">Thoát</button>
 </div>
 
