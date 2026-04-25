@@ -9,19 +9,24 @@ function saveData(d) {
   localStorage.setItem("data", JSON.stringify(d));
 }
 
+function getWrong() {
+  return JSON.parse(localStorage.getItem("wrong")) || {};
+}
+function saveWrong(d) {
+  localStorage.setItem("wrong", JSON.stringify(d));
+}
+
 // ===== INIT =====
 function init() {
   const tabs = document.getElementById("tabs");
   const select = document.getElementById("lessonSelect");
 
   for (let i = 1; i <= TOTAL; i++) {
-    // tabs
     let b = document.createElement("button");
     b.innerText = "Buổi " + i;
     b.onclick = () => changeLesson(i);
     tabs.appendChild(b);
 
-    // select
     let o = document.createElement("option");
     o.value = i;
     o.text = "Buổi " + i;
@@ -31,11 +36,11 @@ function init() {
   changeLesson(1);
 }
 
+// ===== CHANGE =====
 function changeLesson(l) {
   currentLesson = l;
-  document.getElementById("lessonSelect").value = l;
+  lessonSelect.value = l;
 
-  // highlight tab
   document.querySelectorAll(".tabs button").forEach((b, i) => {
     b.classList.toggle("active", i + 1 === l);
   });
@@ -58,33 +63,33 @@ function render() {
       </div>`;
   });
 
-  document.getElementById("list").innerHTML = html;
+  listDiv.innerHTML = html;
 }
 
 // ===== ADD =====
 function addWord() {
-  const jp = jpInput.value.trim();
-  const vi = viInput.value.trim();
-  const lesson = lessonSelect.value;
-
-  if (!jp || !vi) return alert("Nhập đủ!");
+  if (!jp.value || !vi.value) return alert("Nhập đủ!");
 
   let data = getData();
-  if (!data[lesson]) data[lesson] = [];
+  if (!data[currentLesson]) data[currentLesson] = [];
 
-  data[lesson].push({ jp, vi });
+  data[currentLesson].push({ jp: jp.value, vi: vi.value });
 
   saveData(data);
-  jpInput.value = "";
-  viInput.value = "";
 
-  changeLesson(lesson);
+  jp.value = "";
+  vi.value = "";
+
+  render();
 }
 
-// ===== DELETE =====
+// ===== DELETE (ANTI MISTAKE) =====
 function del(i) {
+  if (!confirm("Xóa từ này?")) return;
+
   let data = getData();
   data[currentLesson].splice(i, 1);
+
   saveData(data);
   render();
 }
@@ -94,75 +99,88 @@ function importTxt() {
   const file = fileInput.files[0];
   if (!file) return alert("Chọn file!");
 
-  const lesson = lessonSelect.value;
-
   const reader = new FileReader();
 
   reader.onload = e => {
     let lines = e.target.result.split("\n");
 
     let data = getData();
-    if (!data[lesson]) data[lesson] = [];
-
-    let count = 0;
+    if (!data[currentLesson]) data[currentLesson] = [];
 
     lines.forEach(line => {
-      line = line.trim();
-      if (!line) return;
-
       let parts = line.split(";");
-
       if (parts.length >= 2) {
-        let jp = parts[0].trim();
-        let vi = parts[1].trim();
-
-        if (!data[lesson].some(w => w.jp === jp)) {
-          data[lesson].push({ jp, vi });
-          count++;
-        }
+        data[currentLesson].push({
+          jp: parts[0].trim(),
+          vi: parts[1].trim()
+        });
       }
     });
 
     saveData(data);
-    alert("Import: " + count + " từ");
-    changeLesson(lesson);
+    alert("Import xong!");
+    render();
   };
 
   reader.readAsText(file);
 }
 
-// ===== FLASHCARD =====
+// ===== FLASH =====
 let flashList = [];
 let idx = 0;
-let flipState = false;
+let flipped = false;
 
 function startFlash() {
-  let data = getData();
-  flashList = data[currentLesson] || [];
-
-  if (flashList.length === 0) return alert("Không có từ!");
+  flashList = getData()[currentLesson] || [];
+  if (!flashList.length) return alert("Không có từ!");
 
   idx = 0;
-  flipState = false;
+  flipped = false;
 
   flash.classList.remove("hidden");
-  showCard();
+  show();
 }
 
-function showCard() {
+function startWrong() {
+  flashList = getWrong()[currentLesson] || [];
+  if (!flashList.length) return alert("Không có từ sai!");
+
+  idx = 0;
+  flipped = false;
+
+  flash.classList.remove("hidden");
+  show();
+}
+
+function show() {
   let c = flashList[idx];
-  card.innerText = flipState ? c.vi : c.jp;
+  card.innerText = flipped ? c.vi : c.jp;
 }
 
 function flip() {
-  flipState = !flipState;
-  showCard();
+  flipped = !flipped;
+  show();
+}
+
+function markWrong() {
+  let wrong = getWrong();
+  if (!wrong[currentLesson]) wrong[currentLesson] = [];
+
+  wrong[currentLesson].push(flashList[idx]);
+  saveWrong(wrong);
+
+  next();
+}
+
+function markRight() {
+  next();
 }
 
 function next() {
-  idx = (idx + 1) % flashList.length;
-  flipState = false;
-  showCard();
+  idx++;
+  if (idx >= flashList.length) idx = 0;
+  flipped = false;
+  show();
 }
 
 function closeFlash() {
