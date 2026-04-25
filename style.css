@@ -3,25 +3,22 @@ body {
   padding: 20px;
 }
 
-.tabs {
-  margin-bottom: 15px;
-}
-
 .tabs button {
   margin: 4px;
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 15px;
   border: none;
-  background: #ddd;
+  background: #e0e0e0;
   cursor: pointer;
 }
 
-.tabs button:hover {
-  background: #aaa;
+.tabs button.active {
+  background: #4caf50;
+  color: white;
 }
 
-.form {
-  margin-top: 20px;
+.panel {
+  margin-top: 15px;
 }
 
 input, select {
@@ -30,6 +27,18 @@ input, select {
 }
 
 .word {
-  padding: 8px;
+  padding: 6px;
   border-bottom: 1px solid #ccc;
+}
+
+.flash {
+  margin-top: 20px;
+  padding: 30px;
+  border: 2px solid #333;
+  text-align: center;
+  font-size: 24px;
+}
+
+.hidden {
+  display: none;
 }
