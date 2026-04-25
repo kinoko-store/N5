@@ -1,37 +1,32 @@
 body {
   font-family: Arial;
   padding: 20px;
-  background: linear-gradient(to right, #74ebd5, #9face6);
+  background: linear-gradient(135deg, #74ebd5, #9face6);
 }
 
 h1 {
   text-align: center;
 }
 
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 12px;
+}
+
 .tabs button {
   margin: 4px;
   padding: 8px 12px;
-  border-radius: 15px;
+  border-radius: 20px;
   border: none;
-  background: white;
+  background: #eee;
   cursor: pointer;
 }
 
 .tabs button.active {
   background: #4caf50;
   color: white;
-}
-
-.card {
-  background: white;
-  padding: 15px;
-  margin-top: 15px;
-  border-radius: 10px;
-}
-
-input, select {
-  margin: 5px;
-  padding: 8px;
 }
 
 .word {
@@ -44,18 +39,14 @@ input, select {
 .flash {
   margin-top: 20px;
   padding: 30px;
-  border-radius: 15px;
   background: white;
+  border-radius: 15px;
   text-align: center;
 }
 
-.flash #card {
-  font-size: 28px;
+#card {
+  font-size: 30px;
   margin-bottom: 20px;
-}
-
-.flash-btn button {
-  margin: 5px;
 }
 
 .hidden {
