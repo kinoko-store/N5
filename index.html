@@ -2,55 +2,38 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Flashcard N5</title>
+  <title>N5 Vocabulary</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h1>📚 Flashcard N5</h1>
+<h1>Học từ vựng N5</h1>
 
-<!-- TAB -->
+<!-- Tabs -->
 <div class="tabs">
-  <button onclick="loadLesson('input.txt')">Buổi hiện tại</button>
-  <button onclick="loadLesson('lesson1.txt')">Buổi 1</button>
-  <button onclick="loadLesson('lesson2.txt')">Buổi 2</button>
+  <button onclick="loadLesson('1')">Buổi 1</button>
+  <button onclick="loadLesson('2')">Buổi 2</button>
+  <button onclick="loadLesson('3')">Buổi 3</button>
 </div>
 
-<!-- MODE -->
-<div class="top-bar">
-  <span id="mode">Nhật → Việt</span>
-  <button onclick="toggleMode()">🔄</button>
+<!-- Form thêm -->
+<div class="form">
+  <h3>➕ Thêm từ vựng</h3>
+
+  <select id="lesson">
+    <option value="1">Buổi 1</option>
+    <option value="2">Buổi 2</option>
+    <option value="3">Buổi 3</option>
+  </select>
+
+  <input id="jp" placeholder="Tiếng Nhật">
+  <input id="vi" placeholder="Nghĩa">
+
+  <button onclick="addWord()">Thêm</button>
 </div>
 
-<!-- CARD -->
-<div class="card-container" onclick="flipCard()">
-  <div class="card" id="card">
-    <div class="front" id="front"></div>
-    <div class="back" id="back"></div>
-  </div>
-</div>
-
-<!-- CONTROL -->
-<div class="controls">
-  <button onclick="prevCard()">⬅️</button>
-  <button onclick="nextCard()">➡️</button>
-  <button onclick="randomCard()">🎲</button>
-  <button onclick="speak()">🔊</button>
-</div>
-
-<div class="controls">
-  <button class="good" onclick="markKnown()">Biết</button>
-  <button class="bad" onclick="markWrong()">Chưa biết</button>
-</div>
-
-<div class="controls">
-  <button onclick="studyWrong()">📚 Sai</button>
-  <button onclick="backToAll()">🔙 Tất cả</button>
-</div>
-
-<p id="progress"></p>
-<p id="wrongCount"></p>
+<!-- Hiển thị -->
+<div id="app"></div>
 
 <script src="script.js"></script>
 </body>
