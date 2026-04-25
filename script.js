@@ -1,35 +1,66 @@
-body {
-  font-family: Arial;
-  padding: 20px;
+// ===== LOCAL STORAGE =====
+function getData() {
+  return JSON.parse(localStorage.getItem("data")) || {};
 }
 
-.tabs button {
-  margin: 5px;
-  padding: 10px 15px;
-  border-radius: 20px;
-  border: none;
-  background: #ddd;
-  cursor: pointer;
+function saveData(data) {
+  localStorage.setItem("data", JSON.stringify(data));
 }
 
-.tabs button:hover {
-  background: #aaa;
+// ===== LOAD LESSON =====
+function loadLesson(lesson) {
+  const data = getData();
+  const words = data[lesson] || [];
+
+  let html = "";
+
+  words.forEach((w, index) => {
+    html += `
+      <div class="word">
+        ${w.jp} - ${w.vi}
+        <button onclick="deleteWord('${lesson}', ${index})">❌</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("app").innerHTML = html;
 }
 
-.form {
-  margin-top: 20px;
+// ===== ADD WORD =====
+function addWord() {
+  const lesson = document.getElementById("lesson").value;
+  const jp = document.getElementById("jp").value;
+  const vi = document.getElementById("vi").value;
+
+  if (!jp || !vi) {
+    alert("Nhập đầy đủ!");
+    return;
+  }
+
+  let data = getData();
+
+  if (!data[lesson]) data[lesson] = [];
+
+  data[lesson].push({ jp, vi });
+
+  saveData(data);
+
+  document.getElementById("jp").value = "";
+  document.getElementById("vi").value = "";
+
+  loadLesson(lesson);
 }
 
-input, select {
-  margin: 5px;
-  padding: 8px;
+// ===== DELETE =====
+function deleteWord(lesson, index) {
+  let data = getData();
+
+  data[lesson].splice(index, 1);
+
+  saveData(data);
+
+  loadLesson(lesson);
 }
 
-#app {
-  margin-top: 20px;
-}
-
-.word {
-  padding: 8px;
-  border-bottom: 1px solid #ccc;
-}
+// ===== LOAD MẶC ĐỊNH =====
+loadLesson('1');
