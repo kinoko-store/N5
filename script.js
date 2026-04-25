@@ -2,19 +2,8 @@ const TOTAL = 25;
 let currentLesson = 1;
 
 // ===== STORAGE =====
-function getData() {
-  return JSON.parse(localStorage.getItem("data")) || {};
-}
-function saveData(d) {
-  localStorage.setItem("data", JSON.stringify(d));
-}
-
-function getWrong() {
-  return JSON.parse(localStorage.getItem("wrong")) || {};
-}
-function saveWrong(d) {
-  localStorage.setItem("wrong", JSON.stringify(d));
-}
+const get = key => JSON.parse(localStorage.getItem(key)) || {};
+const set = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
 // ===== INIT =====
 function init() {
@@ -22,22 +11,22 @@ function init() {
   const select = document.getElementById("lessonSelect");
 
   for (let i = 1; i <= TOTAL; i++) {
-    let b = document.createElement("button");
-    b.innerText = "Buổi " + i;
-    b.onclick = () => changeLesson(i);
-    tabs.appendChild(b);
+    let btn = document.createElement("button");
+    btn.innerText = "Buổi " + i;
+    btn.onclick = () => change(i);
+    tabs.appendChild(btn);
 
-    let o = document.createElement("option");
-    o.value = i;
-    o.text = "Buổi " + i;
-    select.appendChild(o);
+    let op = document.createElement("option");
+    op.value = i;
+    op.text = "Buổi " + i;
+    select.appendChild(op);
   }
 
-  changeLesson(1);
+  change(1);
 }
 
 // ===== CHANGE =====
-function changeLesson(l) {
+function change(l) {
   currentLesson = l;
   lessonSelect.value = l;
 
@@ -46,14 +35,15 @@ function changeLesson(l) {
   });
 
   render();
+  updateStats();
 }
 
 // ===== RENDER =====
 function render() {
-  const data = getData();
-  const list = data[currentLesson] || [];
+  let data = get("data");
+  let list = data[currentLesson] || [];
 
-  let html = `<h3>Buổi ${currentLesson}</h3>`;
+  let html = `<h3>Buổi ${currentLesson} (${list.length} từ)</h3>`;
 
   list.forEach((w, i) => {
     html += `
@@ -68,123 +58,153 @@ function render() {
 
 // ===== ADD =====
 function addWord() {
-  if (!jp.value || !vi.value) return alert("Nhập đủ!");
+  if (!jp.value || !vi.value) return;
 
-  let data = getData();
+  let data = get("data");
   if (!data[currentLesson]) data[currentLesson] = [];
 
   data[currentLesson].push({ jp: jp.value, vi: vi.value });
 
-  saveData(data);
-
-  jp.value = "";
-  vi.value = "";
+  set("data", data);
+  jp.value = vi.value = "";
 
   render();
+  updateStats();
 }
 
-// ===== DELETE (ANTI MISTAKE) =====
+// ===== DELETE =====
 function del(i) {
-  if (!confirm("Xóa từ này?")) return;
+  if (!confirm("Xóa?")) return;
 
-  let data = getData();
+  let data = get("data");
   data[currentLesson].splice(i, 1);
+  set("data", data);
 
-  saveData(data);
   render();
+  updateStats();
 }
 
 // ===== IMPORT =====
 function importTxt() {
-  const file = fileInput.files[0];
-  if (!file) return alert("Chọn file!");
+  let file = fileInput.files[0];
+  if (!file) return;
 
-  const reader = new FileReader();
+  let reader = new FileReader();
 
   reader.onload = e => {
     let lines = e.target.result.split("\n");
+    let data = get("data");
 
-    let data = getData();
     if (!data[currentLesson]) data[currentLesson] = [];
 
-    lines.forEach(line => {
-      let parts = line.split(";");
-      if (parts.length >= 2) {
-        data[currentLesson].push({
-          jp: parts[0].trim(),
-          vi: parts[1].trim()
-        });
+    lines.forEach(l => {
+      let p = l.split(";");
+      if (p.length >= 2) {
+        data[currentLesson].push({ jp: p[0], vi: p[1] });
       }
     });
 
-    saveData(data);
-    alert("Import xong!");
+    set("data", data);
     render();
+    updateStats();
   };
 
   reader.readAsText(file);
 }
 
 // ===== FLASH =====
-let flashList = [];
-let idx = 0;
-let flipped = false;
+let list = [], i = 0, flipState = false;
 
 function startFlash() {
-  flashList = getData()[currentLesson] || [];
-  if (!flashList.length) return alert("Không có từ!");
-
-  idx = 0;
-  flipped = false;
-
-  flash.classList.remove("hidden");
-  show();
+  list = get("data")[currentLesson] || [];
+  start();
 }
 
 function startWrong() {
-  flashList = getWrong()[currentLesson] || [];
-  if (!flashList.length) return alert("Không có từ sai!");
+  list = get("wrong")[currentLesson] || [];
+  start();
+}
 
-  idx = 0;
-  flipped = false;
-
+function start() {
+  if (!list.length) return alert("Không có từ!");
+  i = 0;
+  flipState = false;
   flash.classList.remove("hidden");
   show();
 }
 
 function show() {
-  let c = flashList[idx];
-  card.innerText = flipped ? c.vi : c.jp;
+  let c = list[i];
+  card.innerText = flipState ? c.vi : c.jp;
+}
+
+// 🔊 SPEAK
+function speak() {
+  let c = list[i];
+  let u = new SpeechSynthesisUtterance(c.jp);
+  u.lang = "ja-JP";
+  speechSynthesis.speak(u);
 }
 
 function flip() {
-  flipped = !flipped;
+  flipState = !flipState;
   show();
 }
 
 function markWrong() {
-  let wrong = getWrong();
-  if (!wrong[currentLesson]) wrong[currentLesson] = [];
+  let w = get("wrong");
+  if (!w[currentLesson]) w[currentLesson] = [];
+  w[currentLesson].push(list[i]);
+  set("wrong", w);
 
-  wrong[currentLesson].push(flashList[idx]);
-  saveWrong(wrong);
-
+  markLearned();
   next();
 }
 
 function markRight() {
+  markLearned();
   next();
 }
 
+function markLearned() {
+  let learned = get("learned");
+  if (!learned[currentLesson]) learned[currentLesson] = [];
+
+  learned[currentLesson].push(list[i]);
+  set("learned", learned);
+}
+
+// ===== NEXT =====
 function next() {
-  idx++;
-  if (idx >= flashList.length) idx = 0;
-  flipped = false;
+  i = (i + 1) % list.length;
+  flipState = false;
   show();
 }
 
 function closeFlash() {
   flash.classList.add("hidden");
+}
+
+// ===== STATS =====
+function updateStats() {
+  let data = get("data");
+  let wrong = get("wrong");
+  let learned = get("learned");
+
+  let total = 0, wCount = 0, lCount = 0;
+
+  for (let i = 1; i <= TOTAL; i++) {
+    total += (data[i] || []).length;
+    wCount += (wrong[i] || []).length;
+    lCount += (learned[i] || []).length;
+  }
+
+  stats.innerHTML = `
+    <h3>📊 Thống kê</h3>
+    Tổng từ: ${total} |
+    Đã học: ${lCount} |
+    Sai: ${wCount}
+  `;
 }
 
 // ===== START =====
