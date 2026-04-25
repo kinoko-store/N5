@@ -2,34 +2,31 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>N5 Vocabulary</title>
+  <title>N5 Offline App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Học từ vựng N5</h1>
+<h1>📘 Học từ vựng N5 (Offline)</h1>
 
 <!-- Tabs -->
-<div class="tabs">
-  <button onclick="loadLesson('1')">Buổi 1</button>
-  <button onclick="loadLesson('2')">Buổi 2</button>
-  <button onclick="loadLesson('3')">Buổi 3</button>
-</div>
+<div id="tabs" class="tabs"></div>
 
-<!-- Form thêm -->
+<!-- Form -->
 <div class="form">
-  <h3>➕ Thêm từ vựng</h3>
+  <h3>➕ Thêm từ</h3>
 
-  <select id="lesson">
-    <option value="1">Buổi 1</option>
-    <option value="2">Buổi 2</option>
-    <option value="3">Buổi 3</option>
-  </select>
-
+  <select id="lesson"></select>
   <input id="jp" placeholder="Tiếng Nhật">
   <input id="vi" placeholder="Nghĩa">
 
   <button onclick="addWord()">Thêm</button>
+
+  <hr>
+
+  <h3>📥 Import file TXT</h3>
+  <input type="file" id="fileInput" accept=".txt">
+  <button onclick="importFile()">Import TXT</button>
 </div>
 
 <!-- Hiển thị -->
