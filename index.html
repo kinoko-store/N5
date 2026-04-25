@@ -1,36 +1,43 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>N5 Offline App</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>N5 Learning App</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h1>📘 Học từ vựng N5 (Offline)</h1>
+<h1>📘 N5 Vocabulary</h1>
 
 <!-- Tabs -->
 <div id="tabs" class="tabs"></div>
 
 <!-- Form -->
-<div class="form">
-  <h3>➕ Thêm từ</h3>
+<div class="panel">
+  <select id="lessonSelect"></select>
 
-  <select id="lesson"></select>
   <input id="jp" placeholder="Tiếng Nhật">
   <input id="vi" placeholder="Nghĩa">
 
-  <button onclick="addWord()">Thêm</button>
+  <button onclick="addWord()">➕ Thêm</button>
 
-  <hr>
-
-  <h3>📥 Import file TXT</h3>
   <input type="file" id="fileInput" accept=".txt">
-  <button onclick="importFile()">Import TXT</button>
+  <button onclick="importTxt()">📥 Import</button>
+
+  <button onclick="startFlash()">🎴 Học</button>
 </div>
 
-<!-- Hiển thị -->
-<div id="app"></div>
+<!-- List -->
+<div id="list"></div>
+
+<!-- Flashcard -->
+<div id="flash" class="flash hidden">
+  <div id="card"></div>
+  <button onclick="flip()">Lật</button>
+  <button onclick="next()">Tiếp</button>
+  <button onclick="closeFlash()">Thoát</button>
+</div>
 
 <script src="script.js"></script>
 </body>
