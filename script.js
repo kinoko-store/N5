@@ -1,135 +1,173 @@
-const TOTAL_LESSONS = 25;
+const TOTAL = 25;
+let currentLesson = 1;
 
 // ===== STORAGE =====
 function getData() {
   return JSON.parse(localStorage.getItem("data")) || {};
 }
-
-function saveData(data) {
-  localStorage.setItem("data", JSON.stringify(data));
+function saveData(d) {
+  localStorage.setItem("data", JSON.stringify(d));
 }
 
-// ===== UI =====
-function initUI() {
+// ===== INIT =====
+function init() {
   const tabs = document.getElementById("tabs");
-  const select = document.getElementById("lesson");
+  const select = document.getElementById("lessonSelect");
 
-  for (let i = 1; i <= TOTAL_LESSONS; i++) {
-    let btn = document.createElement("button");
-    btn.innerText = "Buổi " + i;
-    btn.onclick = () => loadLesson(i);
-    tabs.appendChild(btn);
+  for (let i = 1; i <= TOTAL; i++) {
+    // tabs
+    let b = document.createElement("button");
+    b.innerText = "Buổi " + i;
+    b.onclick = () => changeLesson(i);
+    tabs.appendChild(b);
 
-    let opt = document.createElement("option");
-    opt.value = i;
-    opt.innerText = "Buổi " + i;
-    select.appendChild(opt);
+    // select
+    let o = document.createElement("option");
+    o.value = i;
+    o.text = "Buổi " + i;
+    select.appendChild(o);
   }
+
+  changeLesson(1);
 }
 
-// ===== LOAD =====
-function loadLesson(lesson) {
+function changeLesson(l) {
+  currentLesson = l;
+  document.getElementById("lessonSelect").value = l;
+
+  // highlight tab
+  document.querySelectorAll(".tabs button").forEach((b, i) => {
+    b.classList.toggle("active", i + 1 === l);
+  });
+
+  render();
+}
+
+// ===== RENDER =====
+function render() {
   const data = getData();
-  const words = data[lesson] || [];
+  const list = data[currentLesson] || [];
 
-  let html = `<h3>📘 Buổi ${lesson}</h3>`;
+  let html = `<h3>Buổi ${currentLesson}</h3>`;
 
-  words.forEach((w, index) => {
+  list.forEach((w, i) => {
     html += `
       <div class="word">
         ${w.jp} - ${w.vi}
-        <button onclick="deleteWord(${lesson}, ${index})">❌</button>
-      </div>
-    `;
+        <button onclick="del(${i})">❌</button>
+      </div>`;
   });
 
-  document.getElementById("app").innerHTML = html;
+  document.getElementById("list").innerHTML = html;
 }
 
 // ===== ADD =====
 function addWord() {
-  const lesson = document.getElementById("lesson").value;
-  const jp = document.getElementById("jp").value.trim();
-  const vi = document.getElementById("vi").value.trim();
+  const jp = jpInput.value.trim();
+  const vi = viInput.value.trim();
+  const lesson = lessonSelect.value;
 
-  if (!jp || !vi) {
-    alert("Nhập đầy đủ!");
-    return;
-  }
+  if (!jp || !vi) return alert("Nhập đủ!");
 
   let data = getData();
-
   if (!data[lesson]) data[lesson] = [];
 
   data[lesson].push({ jp, vi });
 
   saveData(data);
+  jpInput.value = "";
+  viInput.value = "";
 
-  document.getElementById("jp").value = "";
-  document.getElementById("vi").value = "";
-
-  loadLesson(lesson);
+  changeLesson(lesson);
 }
 
 // ===== DELETE =====
-function deleteWord(lesson, index) {
+function del(i) {
   let data = getData();
-
-  data[lesson].splice(index, 1);
-
+  data[currentLesson].splice(i, 1);
   saveData(data);
-
-  loadLesson(lesson);
+  render();
 }
 
-// ===== IMPORT TXT =====
-function importFile() {
-  const file = document.getElementById("fileInput").files[0];
+// ===== IMPORT =====
+function importTxt() {
+  const file = fileInput.files[0];
+  if (!file) return alert("Chọn file!");
 
-  if (!file) {
-    alert("Chọn file trước!");
-    return;
-  }
-
-  const lesson = document.getElementById("lesson").value;
+  const lesson = lessonSelect.value;
 
   const reader = new FileReader();
 
-  reader.onload = function(e) {
-    const text = e.target.result;
-
-    const lines = text.split('\n');
+  reader.onload = e => {
+    let lines = e.target.result.split("\n");
 
     let data = getData();
-
     if (!data[lesson]) data[lesson] = [];
 
-    lines.forEach(line => {
-      if (!line.trim()) return;
+    let count = 0;
 
-      const parts = line.split(';');
+    lines.forEach(line => {
+      line = line.trim();
+      if (!line) return;
+
+      let parts = line.split(";");
 
       if (parts.length >= 2) {
-        const jp = parts[0].trim();
-        const vi = parts[1].trim();
+        let jp = parts[0].trim();
+        let vi = parts[1].trim();
 
-        // tránh trùng
         if (!data[lesson].some(w => w.jp === jp)) {
           data[lesson].push({ jp, vi });
+          count++;
         }
       }
     });
 
     saveData(data);
-
-    alert("✅ Import thành công!");
-
-    loadLesson(lesson);
+    alert("Import: " + count + " từ");
+    changeLesson(lesson);
   };
 
   reader.readAsText(file);
 }
 
-// ===== INIT =====
-initUI();
-loadLesson(1);
+// ===== FLASHCARD =====
+let flashList = [];
+let idx = 0;
+let flipState = false;
+
+function startFlash() {
+  let data = getData();
+  flashList = data[currentLesson] || [];
+
+  if (flashList.length === 0) return alert("Không có từ!");
+
+  idx = 0;
+  flipState = false;
+
+  flash.classList.remove("hidden");
+  showCard();
+}
+
+function showCard() {
+  let c = flashList[idx];
+  card.innerText = flipState ? c.vi : c.jp;
+}
+
+function flip() {
+  flipState = !flipState;
+  showCard();
+}
+
+function next() {
+  idx = (idx + 1) % flashList.length;
+  flipState = false;
+  showCard();
+}
+
+function closeFlash() {
+  flash.classList.add("hidden");
+}
+
+// ===== START =====
+init();
